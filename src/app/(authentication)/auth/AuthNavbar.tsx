@@ -24,7 +24,7 @@ export function AuthNavbar() {
     <header className="border-b bg-background">
       <div className="container flex h-16 items-center justify-between px-4">
         <Link href="/" className="font-bold text-xl">
-          Sindria 2.0
+          H8X
         </Link>
 
         <nav className="flex items-center gap-4">
@@ -32,18 +32,14 @@ export function AuthNavbar() {
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
           ) : session?.user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm hidden md:inline-block">
-                {session.user.name || session.user.email}
-              </span>
+              <span className="text-sm hidden md:inline-block">{session.user.name || session.user.email}</span>
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   {session.user.image ? (
                     <AvatarImage src={session.user.image} alt={session.user.name || "User"} />
                   ) : (
                     <AvatarFallback>
-                      {session.user.name
-                        ? session.user.name.charAt(0).toUpperCase()
-                        : "U"}
+                      {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                     </AvatarFallback>
                   )}
                 </Avatar>
@@ -66,4 +62,4 @@ export function AuthNavbar() {
       </div>
     </header>
   );
-} 
+}
