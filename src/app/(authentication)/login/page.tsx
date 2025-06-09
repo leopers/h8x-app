@@ -72,7 +72,6 @@ export default function LoginPage() {
                 <span className="absolute inset-0 bg-gradient-to-tr from-[#18005E]/80 to-[#18005E]/60 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
               </TabsTrigger>
             </TabsList>
-
             <div className="relative">
               <div
                 className={cn(
