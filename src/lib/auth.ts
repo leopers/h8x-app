@@ -14,4 +14,15 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  credentialsProvider: {
+    email: {
+      enabled: true,
+      hashing: {
+        secret: process.env.CREDENTIALS_PASSWORD_SECRET as string,
+      },
+      tokens: {
+        secret: process.env.CREDENTIALS_TOKEN_SECRET as string,
+      },
+    },
+  },
 });
