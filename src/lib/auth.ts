@@ -7,4 +7,11 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   basePath: "/api/auth",
+  socialProviders: {
+    google: {
+      enabled: true,
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
 });
