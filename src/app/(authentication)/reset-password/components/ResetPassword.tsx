@@ -3,17 +3,25 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
+import { resetPassword } from "@/lib/auth-client";
 import { Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ResetPasswordSchema } from "@/zod";
+import { z } from "zod";
+const ResetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  });
 
 type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 
@@ -22,7 +30,7 @@ export default function ResetPassword() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const token = searchParams.get("token") as string;
+  const token = searchParams?.get("token") as string;
   const {
     register,
     handleSubmit,
@@ -52,7 +60,7 @@ export default function ResetPassword() {
 
   const onSubmit = async (data: ResetPasswordForm) => {
     try {
-      await authClient.resetPassword(
+      await resetPassword(
         {
           newPassword: data.password,
           token: token,
