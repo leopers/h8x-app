@@ -1,18 +1,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  
+
   // Check if we're in a conversation detail page
-  const isInConversation = pathname ? pathname.includes('/profile/conversations/') && pathname.split('/').length > 3 : false;
-  
+  const isInConversation = pathname
+    ? pathname.includes("/profile/conversations/") &&
+      pathname.split("/").length > 3
+    : false;
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="w-[390px] mx-auto h-screen bg-white overflow-y-auto relative shadow-xl">
         <div className="">
-          <div className="h-[120px] w-full bg-gradient-to-r from-[#1E90FF] to-[#000022] relative">
+          <div className="h-[120px] w-full bg-gradient-to-r from-[#27005D] to-[#1a0040] relative">
+            {/* H8X.com Logo */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+              <div className="bg-white/20 backdrop-blur-md rounded-xl px-6 py-3 border border-white/40 shadow-xl">
+                <span
+                  className="text-white font-black text-2xl tracking-wider"
+                  style={{
+                    fontFamily:
+                      '"Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+                    textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  H8X.com
+                </span>
+              </div>
+            </div>
+
             {pathname === "/" ? (
               <div
                 className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-[120px] h-12 bg-white"
@@ -25,18 +44,22 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
               <div></div>
             )}
           </div>
-
-          <div className="absolute top-4 left-33">
-            <Image src="/logo.png" alt="H8X Logo" width={50} height={50} className="h-25 w-25" />
-          </div>
           {children}
-          
+
           {/* Only show navigation when not in conversation detail */}
           {!isInConversation && (
             <nav className="fixed bottom-0 left-0 right-0 w-[390px] mx-auto bg-white border-t py-2">
               <div className="flex justify-around items-center px-6">
-                <Link href="/" className={`${pathname === "/" ? "text-[#27005D]" : "text-gray-400"}`}>
-                  <svg className="w-6 h-6 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link
+                  href="/"
+                  className={`${pathname === "/" ? "text-[#27005D]" : "text-gray-400"}`}
+                >
+                  <svg
+                    className="w-6 h-6 "
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -45,8 +68,16 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
                     />
                   </svg>
                 </Link>
-                <Link href="/products" className={`${pathname === "/products" ? "text-[#27005D]" : "text-gray-400"}`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link
+                  href="/products"
+                  className={`${pathname === "/products" ? "text-[#27005D]" : "text-gray-400"}`}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -74,8 +105,16 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
                     ></path>
                   </svg>
                 </Link>
-                <Link href="/favorites" className={`${pathname === "/favorites" ? "text-[#27005D]" : "text-gray-400"}`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link
+                  href="/favorites"
+                  className={`${pathname === "/favorites" ? "text-[#27005D]" : "text-gray-400"}`}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -84,8 +123,16 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
                     />
                   </svg>
                 </Link>
-                <Link href="/profile" className={`${pathname === "/profile" ? "text-[#27005D]" : "text-gray-400"}`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <Link
+                  href="/profile"
+                  className={`${pathname === "/profile" ? "text-[#27005D]" : "text-gray-400"}`}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

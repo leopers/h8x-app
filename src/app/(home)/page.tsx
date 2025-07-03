@@ -6,7 +6,7 @@ import { AvatarImage, Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { MapPin, LogOut } from "lucide-react";
+import { MapPin, LogOut, ChevronRight } from "lucide-react";
 import { getUserHomeData } from "./actions";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ export default function Home() {
   const getInitials = (name: string) => {
     return name
       .split(" ")
-      .map(part => part.charAt(0))
+      .map((part) => part.charAt(0))
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -169,15 +169,18 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
+
       <div className="px-4 mt-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold">Seus produtos</h2>
-          <Link href="/my-products" className="text-sm text-[#27005D] hover:underline">
+          <Link
+            href="/my-products"
+            className="text-sm text-[#27005D] hover:underline"
+          >
             Ver todos
           </Link>
         </div>
-        
+
         {products.length > 0 ? (
           <div className="grid grid-cols-3 gap-2">
             {products.map((product) => (
@@ -185,10 +188,10 @@ export default function Home() {
                 <Card className="overflow-hidden border-0 shadow-sm">
                   <div className="aspect-square relative">
                     {product.s3UrlImage ? (
-                      <Image 
-                        src={product.s3UrlImage} 
-                        alt={product.name} 
-                        fill 
+                      <Image
+                        src={product.s3UrlImage}
+                        alt={product.name}
+                        fill
                         className="object-cover"
                       />
                     ) : (
@@ -200,7 +203,9 @@ export default function Home() {
                     )}
                   </div>
                   <div className="p-2">
-                    <h3 className="text-xs font-medium truncate">{product.name}</h3>
+                    <h3 className="text-xs font-medium truncate">
+                      {product.name}
+                    </h3>
                     {product.price !== null && (
                       <p className="text-xs text-[#27005D] font-semibold">
                         {formatPrice(product.price)}
@@ -222,7 +227,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      
+
       <div className="px-4 mt-4">
         <Link href="/products" className="block">
           <div className="bg-white rounded-xl p-4 flex items-center justify-between shadow-sm">
@@ -232,10 +237,14 @@ export default function Home() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-600">Explorar</span>
-                <span className="text-sm text-[#27005D] font-semibold">Ver todos os produtos</span>
+                <span className="text-sm text-[#27005D] font-semibold">
+                  Ver todos os produtos
+                </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-[#27005D] rounded-lg"></div>
+            <div className="w-8 h-8 bg-[#27005D] rounded-lg flex items-center justify-center">
+              <ChevronRight size={16} className="text-white" />
+            </div>
           </div>
         </Link>
       </div>

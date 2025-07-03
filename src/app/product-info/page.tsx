@@ -8,8 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MapPin, ArrowLeft, MessageCircle, Send, Phone, Mail } from "lucide-react";
-import { getProductDetails, getOtherSellerProducts, getCurrentUser, sendMessage } from "./actions";
+import {
+  Star,
+  MapPin,
+  ArrowLeft,
+  MessageCircle,
+  Send,
+  Phone,
+  Mail,
+  ChevronRight,
+} from "lucide-react";
+import {
+  getProductDetails,
+  getOtherSellerProducts,
+  getCurrentUser,
+  sendMessage,
+} from "./actions";
 import ChatModal from "./components/ChatModal";
 
 interface ProductData {
@@ -46,13 +60,13 @@ interface OtherProduct {
 export default function ProductInfo() {
   const searchParams = useSearchParams();
   const productId = searchParams?.get("id");
-  
+
   const [product, setProduct] = useState<ProductData | null>(null);
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [otherProducts, setOtherProducts] = useState<OtherProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Chat state
   const [showChatModal, setShowChatModal] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
@@ -68,17 +82,17 @@ export default function ProductInfo() {
 
   const loadProductData = async () => {
     if (!productId) return;
-    
+
     try {
       setIsLoading(true);
       const [productData, userData] = await Promise.all([
         getProductDetails(productId),
         getCurrentUser(),
       ]);
-      
+
       setProduct(productData);
       setCurrentUser(userData);
-      
+
       // Load other seller products
       if (productData) {
         const otherSellerProducts = await getOtherSellerProducts(
@@ -97,7 +111,7 @@ export default function ProductInfo() {
 
   const handleSendMessage = async (messageContent: string) => {
     if (!messageContent.trim() || !product || !currentUser) return;
-    
+
     try {
       setIsSendingMessage(true);
       const result = await sendMessage({
@@ -105,7 +119,7 @@ export default function ProductInfo() {
         receiverId: product.seller.id,
         content: messageContent.trim(),
       });
-      
+
       if (result.success) {
         // Here you would normally update the chat UI
         alert("Mensagem enviada! O vendedor entrará em contato.");
@@ -132,7 +146,7 @@ export default function ProductInfo() {
   const getInitials = (name: string) => {
     return name
       .split(" ")
-      .map(part => part.charAt(0))
+      .map((part) => part.charAt(0))
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -189,10 +203,10 @@ export default function ProductInfo() {
       <div className="p-4 bg-white shadow-sm">
         <div className="aspect-square max-w-xs mx-auto rounded-xl overflow-hidden bg-gray-200">
           {product.s3UrlImage ? (
-            <Image 
-              src={product.s3UrlImage} 
-              alt={product.name} 
-              width={300} 
+            <Image
+              src={product.s3UrlImage}
+              alt={product.name}
+              width={300}
               height={300}
               className="w-full h-full object-cover"
             />
@@ -212,9 +226,13 @@ export default function ProductInfo() {
             <div>{new Date(product.createdAt).toLocaleDateString("pt-BR")}</div>
           </div>
 
-          <h1 className="text-xl font-semibold text-[#27005D] mb-1">{product.name}</h1>
-          <p className="text-2xl font-bold text-gray-800 mb-2">{formatPrice(product.price)}</p>
-          
+          <h1 className="text-xl font-semibold text-[#27005D] mb-1">
+            {product.name}
+          </h1>
+          <p className="text-2xl font-bold text-gray-800 mb-2">
+            {formatPrice(product.price)}
+          </p>
+
           {product.description && (
             <p className="text-gray-600 text-sm mb-4">{product.description}</p>
           )}
@@ -223,7 +241,10 @@ export default function ProductInfo() {
           <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3 mb-4">
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src={product.seller.image || undefined} alt={product.seller.name} />
+                <AvatarImage
+                  src={product.seller.image || undefined}
+                  alt={product.seller.name}
+                />
                 <AvatarFallback className="bg-[#27005D] text-white">
                   {getInitials(product.seller.name)}
                 </AvatarFallback>
@@ -262,7 +283,9 @@ export default function ProductInfo() {
 
           {isOwner && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-              <p className="text-blue-800 text-sm font-medium">Este é o seu produto</p>
+              <p className="text-blue-800 text-sm font-medium">
+                Este é o seu produto
+              </p>
             </div>
           )}
         </div>
@@ -276,17 +299,17 @@ export default function ProductInfo() {
           </h2>
           <div className="flex overflow-x-auto space-x-3 pb-2">
             {otherProducts.map((otherProduct) => (
-              <Link 
-                href={`/product-info?id=${otherProduct.id}`} 
-                key={otherProduct.id} 
+              <Link
+                href={`/product-info?id=${otherProduct.id}`}
+                key={otherProduct.id}
                 className="flex-shrink-0"
               >
                 <Card className="w-[100px] overflow-hidden rounded-lg shadow-md border-0">
                   <div className="aspect-square relative">
                     {otherProduct.s3UrlImage ? (
-                      <Image 
-                        src={otherProduct.s3UrlImage} 
-                        alt={otherProduct.name} 
+                      <Image
+                        src={otherProduct.s3UrlImage}
+                        alt={otherProduct.name}
                         fill
                         className="object-cover"
                       />
@@ -299,7 +322,9 @@ export default function ProductInfo() {
                     )}
                   </div>
                   <div className="p-2">
-                    <p className="text-xs font-medium truncate">{otherProduct.name}</p>
+                    <p className="text-xs font-medium truncate">
+                      {otherProduct.name}
+                    </p>
                     <p className="text-xs text-[#27005D] font-semibold">
                       {formatPrice(otherProduct.price)}
                     </p>
@@ -321,10 +346,14 @@ export default function ProductInfo() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-gray-600">Explorar</span>
-                <span className="text-sm text-[#27005D] font-semibold">Ver todos os produtos</span>
+                <span className="text-sm text-[#27005D] font-semibold">
+                  Ver todos os produtos
+                </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-[#27005D] rounded-lg"></div>
+            <div className="w-8 h-8 bg-[#27005D] rounded-lg flex items-center justify-center">
+              <ChevronRight size={16} className="text-white" />
+            </div>
           </div>
         </Link>
       </div>
