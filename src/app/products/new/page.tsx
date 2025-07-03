@@ -19,9 +19,10 @@ export default function AddProduct() {
   const [images, setImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [productType, setProductType] = useState<"pago" | "bizu">("pago");
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  
+
   const {
     register,
     handleSubmit,
@@ -31,23 +32,24 @@ export default function AddProduct() {
   } = useForm<FormData>({
     resolver: zodResolver(createProductSchema),
   });
-  
+
   const imagesBase64 = watch("imagesBase64");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
       setError(null);
-      
-      // Update the form data with current images
+
+      // Update the form data with current images and handle pricing based on product type
       const formDataWithImages = {
         ...data,
         imagesBase64: images,
+        price: productType === "bizu" ? 0 : data.price, // Force price to 0 for Bizu products
       };
-      
+
       const result = await postProduct(formDataWithImages);
-      
+
       if (result.success) {
         // Redirect to my products page
         router.push("/my-products");
@@ -124,9 +126,34 @@ export default function AddProduct() {
   return (
     <div className="pb-20">
       {/* Tabs */}
-      <div className="flex mb-6">
-        <div className="w-1/2 bg-white py-3 text-center rounded-l-full shadow-sm font-medium">Pago</div>
-        <div className="w-1/2 bg-[#27005D] py-3 text-center rounded-r-full text-white shadow-sm font-medium">Bizu</div>
+      <div className="flex mb-6 mt-6">
+        <button
+          type="button"
+          onClick={() => {
+            setProductType("pago");
+          }}
+          className={`w-1/2 py-3 text-center rounded-l-full shadow-sm font-medium transition-colors ${
+            productType === "pago"
+              ? "bg-[#27005D] text-white"
+              : "bg-white text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          Pago
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setProductType("bizu");
+            setValue("price", 0); // Clear price when switching to Bizu
+          }}
+          className={`w-1/2 py-3 text-center rounded-r-full shadow-sm font-medium transition-colors ${
+            productType === "bizu"
+              ? "bg-[#27005D] text-white"
+              : "bg-white text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          Bizu
+        </button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="px-6">
@@ -139,7 +166,9 @@ export default function AddProduct() {
 
         {/* Add Photos */}
         <div className="mb-6">
-          <p className="text-center font-medium text-lg mb-4">Adicionar fotos</p>
+          <p className="text-center font-medium text-lg mb-4">
+            Adicionar fotos
+          </p>
 
           {/* Image Preview Grid */}
           {images.length > 0 && (
@@ -147,15 +176,30 @@ export default function AddProduct() {
               {images.map((image, index) => (
                 <div key={index} className="relative group">
                   <div className="aspect-square relative rounded-lg overflow-hidden">
-                    <Image src={image} alt={`Preview ${index + 1}`} fill className="object-cover" />
+                    <Image
+                      src={image}
+                      alt={`Preview ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleDeleteImage(index)}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -174,15 +218,26 @@ export default function AddProduct() {
                 className="hidden"
                 onChange={handleImageUpload}
               />
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
             </label>
           </div>
 
           {images.length > 0 && (
             <p className="text-center mt-2 text-sm text-gray-600">
-              {images.length} {`image${images.length === 1 ? "m" : "ns"}`} selecionada
+              {images.length} {`image${images.length === 1 ? "m" : "ns"}`}{" "}
+              selecionada
               {`${images.length === 1 ? "" : "s"}`}
             </p>
           )}
@@ -197,7 +252,9 @@ export default function AddProduct() {
               placeholder="Nome do produto"
               className="bg-gray-100 border-gray-200 rounded-md px-4 py-3 h-12"
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
@@ -206,29 +263,49 @@ export default function AddProduct() {
               placeholder="Descrição"
               className="w-full bg-gray-100 border border-gray-200 rounded-md px-4 py-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-[#27005D]"
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
-          <div>
-            <Input
-              {...register("price", { valueAsNumber: true })}
-              type="number"
-              step="0.01"
-              placeholder="Preço R$"
-              className="bg-gray-100 border-gray-200 rounded-md px-4 py-3 h-12"
-            />
-            {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-          </div>
+          {productType === "pago" && (
+            <div>
+              <Input
+                {...register("price", { valueAsNumber: true })}
+                type="number"
+                step="0.01"
+                placeholder="Preço R$"
+                className="bg-gray-100 border-gray-200 rounded-md px-4 py-3 h-12"
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          {productType === "bizu" && (
+            <div className="bg-green-50 border border-green-200 rounded-md px-4 py-3 h-12 flex items-center justify-center">
+              <span className="text-green-700 font-medium">
+                🎁 Produto Gratuito - Bizu
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Buttons */}
         <div className="mt-6 flex flex-col items-center">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full bg-[#27005D] text-white rounded-full py-6 h-12 font-medium"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Criando produto..." : "Finalizar"}
+            {isSubmitting
+              ? "Criando produto..."
+              : `Finalizar ${productType === "bizu" ? "Bizu" : "Produto Pago"}`}
           </Button>
           <Link href="/my-products" className="mt-3 text-[#27005D]">
             Cancelar

@@ -22,8 +22,20 @@ export default function LoginPage() {
         <div className="flex items-center justify-center mb-6 text-center">
           <div className="flex items-center justify-center mr-2">
             <div className="bg-white p-2 rounded-md">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 3H21V21H3V3Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 3H21V21H3V3Z"
+                  stroke="black"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
                 <path
                   d="M16.5 8.25H7.5V15.75H16.5V8.25Z"
                   stroke="black"
@@ -47,7 +59,12 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-lg shadow-lg border border-[#18005E] bg-white overflow-hidden">
-          <Tabs defaultValue="signin" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            defaultValue="signin"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid grid-cols-2 w-full rounded-xl h-14 p-1 bg-gradient-to-r from-[#0F003A]/20 via-[#18005E]/20 to-[#0F003A]/20 backdrop-blur-sm border-[#18005E]/40">
               <TabsTrigger
                 value="signin"
@@ -81,7 +98,10 @@ export default function LoginPage() {
                     : "translate-x-[-100%] opacity-0 absolute inset-0"
                 )}
               >
-                <TabsContent value="signin" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <TabsContent
+                  value="signin"
+                  className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+                >
                   <SignIn />
                 </TabsContent>
               </div>
@@ -89,10 +109,15 @@ export default function LoginPage() {
               <div
                 className={cn(
                   "transition-all duration-300 transform",
-                  activeTab === "signup" ? "translate-x-0 opacity-100" : "translate-x-[100%] opacity-0 absolute inset-0"
+                  activeTab === "signup"
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-[100%] opacity-0 absolute inset-0"
                 )}
               >
-                <TabsContent value="signup" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <TabsContent
+                  value="signup"
+                  className="mt-0 focus-visible:outline-none focus-visible:ring-0"
+                >
                   <SignUp />
                 </TabsContent>
               </div>
@@ -100,8 +125,10 @@ export default function LoginPage() {
           </Tabs>
         </div>
 
-        <div className="mt-8 text-center text-[hsl(var(--text-secondary))] text-sm animate-fade-in">
-          <p>© {new Date().getFullYear()} H8X. Todos os direitos reservados.</p>
+        <div className="mt-8 text-center text-white/60 text-sm animate-fade-in">
+          <p>
+            © {new Date().getFullYear()} H8X. Todos os direitos reservados.
+          </p>
         </div>
       </div>
 

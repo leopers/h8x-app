@@ -132,15 +132,7 @@ export default function Home() {
               <span className="text-sm">São José dos Campos</span>
             </div>
 
-            <div className="flex gap-12 mt-4">
-              <div className="text-center">
-                <div className="font-semibold text-lg">12</div>
-                <div className="text-sm text-gray-600">Seguidores</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-lg">13</div>
-                <div className="text-sm text-gray-600">Seguindo</div>
-              </div>
+            <div className="flex justify-center mt-4">
               <div className="text-center">
                 <div className="font-semibold text-lg">{products.length}</div>
                 <div className="text-sm text-gray-600">Produtos</div>
@@ -220,7 +212,7 @@ export default function Home() {
           <div className="text-center py-8">
             <p className="text-gray-500 text-sm">Você ainda não tem produtos</p>
             <Link href="/products/new">
-              <Button className="mt-2 bg-[#27005D] hover:bg-[#27005D]/90">
+              <Button className="mt-2 bg-[#27005D] hover:bg-[#27005D]/90 text-white">
                 Adicionar produto
               </Button>
             </Link>
