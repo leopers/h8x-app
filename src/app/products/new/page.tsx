@@ -9,12 +9,19 @@ import { createProductSchema } from "../schemas";
 import { z } from "zod";
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { postProduct } from "../actions";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
 
 type FormData = z.infer<typeof createProductSchema>;
 
 export default function AddProduct() {
   const [images, setImages] = useState<string[]>([]);
-  console.log(images, "images");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+  
   const {
     register,
     handleSubmit,
@@ -24,22 +31,39 @@ export default function AddProduct() {
   } = useForm<FormData>({
     resolver: zodResolver(createProductSchema),
   });
+  
   const imagesBase64 = watch("imagesBase64");
-  console.log(imagesBase64, "imagesBase64");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const onSubmit = async (data: FormData) => {
     try {
-      // Here you would call your postProduct action
-      console.log(data);
+      setIsSubmitting(true);
+      setError(null);
+      
+      // Update the form data with current images
+      const formDataWithImages = {
+        ...data,
+        imagesBase64: images,
+      };
+      
+      const result = await postProduct(formDataWithImages);
+      
+      if (result.success) {
+        // Redirect to my products page
+        router.push("/my-products");
+      } else {
+        setError("Erro ao criar produto. Tente novamente.");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error creating product:", error);
+      setError("Erro ao criar produto. Verifique os dados e tente novamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.files, "event.target.files");
     const files = event.target.files;
-    console.log(files, "files");
     if (files) {
       Array.from(files).forEach((file) => {
         const reader = new FileReader();
@@ -64,6 +88,39 @@ export default function AddProduct() {
     }
   };
 
+  // Mostrar loading se sessão ainda está carregando
+  if (isPending) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7A6FF0] mx-auto mb-4"></div>
+          <div className="text-gray-500">Carregando...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar login se não estiver autenticado
+  if (!session?.user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md p-6 text-center">
+          <h2 className="text-lg font-semibold text-[#27005D] mb-4">
+            Acesso Necessário
+          </h2>
+          <p className="text-gray-500 mb-4">
+            Você precisa estar logado para criar produtos.
+          </p>
+          <Link href="/login">
+            <Button className="w-full bg-[#7A6FF0] text-white">
+              Fazer Login
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-20">
       {/* Tabs */}
@@ -73,6 +130,13 @@ export default function AddProduct() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="px-6">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+
         {/* Add Photos */}
         <div className="mb-6">
           <p className="text-center font-medium text-lg mb-4">Adicionar fotos</p>
@@ -108,13 +172,7 @@ export default function AddProduct() {
                 accept="image/*"
                 multiple
                 className="hidden"
-                onChange={(e) => {
-                  console.log(e.target.files, "e.target.files");
-                  handleImageUpload(e);
-                }}
-                onClick={(e) => {
-                  console.log(e);
-                }}
+                onChange={handleImageUpload}
               />
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -165,10 +223,14 @@ export default function AddProduct() {
 
         {/* Buttons */}
         <div className="mt-6 flex flex-col items-center">
-          <Button type="submit" className="w-full bg-[#27005D] text-white rounded-full py-6 h-12 font-medium">
-            Finalizar
+          <Button 
+            type="submit" 
+            className="w-full bg-[#27005D] text-white rounded-full py-6 h-12 font-medium"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Criando produto..." : "Finalizar"}
           </Button>
-          <Link href="/" className="mt-3 text-[#27005D]">
+          <Link href="/my-products" className="mt-3 text-[#27005D]">
             Cancelar
           </Link>
         </div>

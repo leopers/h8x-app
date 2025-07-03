@@ -1,62 +1,71 @@
 "use server";
 
-import { S3Lib } from "@/lib/s3-lib";
-import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3";
 import prisma from "@/lib/prisma";
 import { createProductSchema } from "./schemas";
 import { z } from "zod";
+import { cookies } from "next/headers";
+import { auth } from "@/lib/auth";
 
-export const getProducts = async (userId: string) => {
-  const s3Lib = S3Lib.getInstance();
-  const command = await s3Lib.client.send(new ListObjectsV2Command({ Bucket: "h8x", Prefix: "products-image/" }));
-  let continuationToken = null;
-  let allObjects: any[] = [];
+export const getProducts = async () => {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  do {
-    const response = await s3Lib.client.send(new ListObjectsV2Command({ Bucket: "h8x", Prefix: "products-image/" }));
-
-    if (response.Contents) {
-      allObjects = allObjects.concat(response.Contents);
-    }
-
-    continuationToken = response.NextContinuationToken;
-  } while (continuationToken);
-  // const products = await s3Lib.client.send(
-  //   new GetObjectCommand({
-  //     Bucket: "h8x",
-  //     Key: "products-image/camera.jpg",
-  //   })
-  // );
-  // const blobImage = await products.Body?.transformToString("base64");
-  // const base64Image = `data:image/jpeg;base64,${blobImage}`;
-  // return base64Image;
-  return allObjects;
+    return products;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw new Error("Failed to fetch products");
+  }
 };
 
 export const postProduct = async (product: z.infer<typeof createProductSchema>) => {
-  //mocked user id
-  const userId = "123";
-  // 1. Validate the product
-  const validatedProduct = createProductSchema.parse(product);
-  // 2. Upload the image to S3
-  const s3Lib = S3Lib.getInstance();
-  validatedProduct.imagesBase64.forEach(async (image, index) => {
-    await s3Lib.client.send(
-      new PutObjectCommand({
-        Bucket: "h8x",
-        Key: `products-image/${validatedProduct.name}-${index}`,
-        Body: image,
-      })
-    );
-  });
-  // 3. Create the product
-  const createdProduct = await prisma.product.create({
-    data: {
-      name: validatedProduct.name,
-      description: validatedProduct.description,
-      price: validatedProduct.price,
-      s3UrlImage: `products-image/${validatedProduct.name}`,
-      sellerId: userId,
-    },
-  });
+  try {
+    // Get current user session from Google auth
+    const cookieStore = await cookies();
+    const headers = new Headers();
+    cookieStore.getAll().forEach(cookie => {
+      headers.append('cookie', `${cookie.name}=${cookie.value}`);
+    });
+    const session = await auth.api.getSession({ headers });
+    if (!session?.user?.id) {
+      throw new Error("User not authenticated");
+    }
+
+    // 1. Validate the product
+    const validatedProduct = createProductSchema.parse(product);
+    
+    // 2. Convert price to cents (integer) for storage
+    const priceInCents = validatedProduct.price ? Math.round(validatedProduct.price * 100) : null;
+    
+    // 3. Save the first image as base64 in the database
+    const firstImage = validatedProduct.imagesBase64[0] || null;
+    
+    // 4. Create the product in the database using the authenticated user
+    const createdProduct = await prisma.product.create({
+      data: {
+        name: validatedProduct.name,
+        description: validatedProduct.description,
+        price: priceInCents,
+        s3UrlImage: firstImage, // Temporarily using this field to store base64 image
+        sellerId: session.user.id,
+      },
+    });
+
+    return { success: true, product: createdProduct };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw new Error("Failed to create product");
+  }
 };

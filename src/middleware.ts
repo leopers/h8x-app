@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
 
   const isLoginRoute = pathname === "/login" || pathname.startsWith("/login/");
 
-  const privateRoutes = ["/", "/products"];
+  const privateRoutes = ["/", "/products", "/profile"];
 
   const isPrivateRoute = privateRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 

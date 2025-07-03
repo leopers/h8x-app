@@ -8,25 +8,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator zod {
-  provider = "zod-prisma"
-  output   = "../src/schemas/zod" // (default) the directory where generated zod schemas will be saved
-
-  relationModel = true // (default) Create and export both plain and related models.
-  // relationModel         = "default" // Do not export model without relations.
-  // relationModel         = false // Do not generate related model
-
-  modelCase = "camelCase" // (default) Output models using camel case (ex. userModel, postModel)
-
-  modelSuffix = "" // (default) Suffix to apply to your prisma models when naming Zod schemas
-
-  // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
-  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
-
-  // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
-  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
-  // prismaJsonNullability = false // allows null assignment to optional JSON fields
-}
+// Note: Removed zod-prisma generator due to compatibility issues with Prisma v6
+// Consider using alternatives like prisma-zod-generator or manual Zod schema creation
 
 datasource db {
   provider = "postgresql"
@@ -44,6 +27,11 @@ model User {
   sessions      Session[]
   accounts      Account[]
   products      Product[]
+  
+  // Chat relationships
+  buyerConversations  Conversation[] @relation("BuyerConversations")
+  sellerConversations Conversation[] @relation("SellerConversations")
+  messages            Message[]
 
   @@unique([email])
   @@map("user")
@@ -94,16 +82,71 @@ model Verification {
   @@map("verification")
 }
 
+enum ProductStatus {
+  ACTIVE
+  SOLD
+  INACTIVE
+}
+
 model Product {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
   name        String
   description String?
   price       Int?
+  status      ProductStatus @default(ACTIVE)
   sellerId    String
   s3UrlImage  String?
-  seller      User     @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  seller      User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Chat relationships
+  conversations Conversation[]
 
   @@map("product")
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  productId String
+  buyerId   String
+  sellerId  String
+  
+  // Relations
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyer     User     @relation("BuyerConversations", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller    User     @relation("SellerConversations", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Ensure one conversation per buyer-seller-product combination
+  @@unique([productId, buyerId, sellerId])
+  @@map("conversation")
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+model Message {
+  id             String        @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  status         MessageStatus @default(SENT)
+  
+  // Relations
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  @@map("message")
 }
