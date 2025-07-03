@@ -9,11 +9,9 @@
     <a href="#sobre-o-projeto"><strong>Explorar a documentação »</strong></a>
     <br />
     <br />
-    <a href="#demonstração">Ver Demo</a>
     ·
     <a href="#instalação">Instalação</a>
     ·
-    <a href="#contribuição">Contribuir</a>
   </p>
 </div>
 
