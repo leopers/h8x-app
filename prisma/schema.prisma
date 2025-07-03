@@ -92,7 +92,7 @@ model Product {
   id          String        @id @default(uuid())
   name        String
   description String?
-  price       Int?
+  price       Float?
   status      ProductStatus @default(ACTIVE)
   sellerId    String
   s3UrlImage  String?
