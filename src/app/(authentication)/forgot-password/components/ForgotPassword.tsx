@@ -4,21 +4,18 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ForgotPasswordSchema } from "@/zod";
-import type { z } from "zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { forgetPassword } from "@/lib/auth-client";
 import { Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
+
+const ForgotPasswordSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
 
 type ForgotPasswordForm = z.infer<typeof ForgotPasswordSchema>;
 
@@ -52,7 +49,7 @@ export default function ForgotPassword() {
 
   const onSubmit = async (data: ForgotPasswordForm) => {
     try {
-      await authClient.forgetPassword(
+      await forgetPassword(
         {
           email: data.email,
           redirectTo: "/reset-password",
@@ -68,16 +65,14 @@ export default function ForgotPassword() {
           onSuccess: () => {
             setSuccess("Link de recuperação de senha enviado com sucesso");
           },
-          onError: (ctx) => {
+          onError: (ctx: any) => {
             setError(ctx.error.message);
           },
         }
       );
     } catch (error) {
       console.log(error);
-      setError(
-        "Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde."
-      );
+      setError("Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.");
     }
   };
 
@@ -95,10 +90,7 @@ export default function ForgotPassword() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-[hsl(var(--text-primary))] font-medium"
-              >
+              <Label htmlFor="email" className="text-[hsl(var(--text-primary))] font-medium">
                 E-mail
               </Label>
               <div className="relative">
@@ -117,17 +109,15 @@ export default function ForgotPassword() {
                   {errors.email.message === "Invalid type"
                     ? "Por favor, insira um e-mail válido"
                     : errors.email.message === "Email is required"
-                    ? "E-mail é obrigatório"
-                    : errors.email.message}
+                      ? "E-mail é obrigatório"
+                      : errors.email.message}
                 </p>
               )}
             </div>
 
             {message && (
               <div className="bg-[hsl(var(--success-background))] p-3 rounded-md border border-[hsl(var(--success-color))]">
-                <p className="text-[hsl(var(--success-color))] text-sm">
-                  {message}
-                </p>
+                <p className="text-[hsl(var(--success-color))] text-sm">{message}</p>
               </div>
             )}
 

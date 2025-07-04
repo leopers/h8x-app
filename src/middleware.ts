@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 
 export async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
-  const onboardingCompleted = cookieStore.get("onboarding-completed")?.value;
   if (
     request.nextUrl.pathname.startsWith("/api") ||
     request.nextUrl.pathname.startsWith("/_next") ||

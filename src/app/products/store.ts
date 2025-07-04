@@ -18,7 +18,7 @@ export const useProductsStore = create<ProductsStore>((set) => ({
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
   fetchProducts: async (userId: string) => {
     set({ isLoading: true });
-    const products = await getProducts(userId);
+    const products = await getProducts();
     console.log(products);
     // set({ products });
     set({ isLoading: false });
